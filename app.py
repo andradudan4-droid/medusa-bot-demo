@@ -590,10 +590,16 @@ def ensure_session():
 
 @app.route("/")
 def index():
-    # No public landing page - we don't want the list of salons we're pitching
-    # to be visible to anyone who hits the bare domain. Prospects only ever get
-    # their own direct /demo/<slug> link, so the root just returns a neutral 404.
-    abort(404)
+    # The bare domain shows the default salon's demo directly, so you can hand a
+    # prospect a clean root URL (e.g. medusa-bot-demo.onrender.com). Other salons
+    # still live at /demo/<slug>, and no list of salons is ever exposed publicly.
+    # Override the default per service with a DEFAULT_SALON env var if you like.
+    slug = os.environ.get("DEFAULT_SALON") or next(iter(SALONS))
+    salon = SALONS.get(slug)
+    if not salon:
+        abort(404)
+    ensure_session()
+    return render_template_string(render_salon_page(slug, salon))
 
 
 @app.route("/demo/<slug>")
