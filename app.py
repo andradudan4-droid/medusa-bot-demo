@@ -580,10 +580,10 @@ def ensure_session():
 
 @app.route("/")
 def index():
-    links = "".join(
-        f'<li><a href="/demo/{s}">{cfg["name"]}</a></li>' for s, cfg in SALONS.items()
-    )
-    return f"<h1>Salon demos</h1><ul>{links}</ul>"
+    # No public landing page - we don't want the list of salons we're pitching
+    # to be visible to anyone who hits the bare domain. Prospects only ever get
+    # their own direct /demo/<slug> link, so the root just returns a neutral 404.
+    abort(404)
 
 
 @app.route("/demo/<slug>")
